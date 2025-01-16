@@ -105,6 +105,27 @@ impl Tree {
         } 
     }
 
+    fn traverse_inorder_recursive(values: &mut Vec<i32>, node: &Box<Node>) {
+        if let Some(le) = node.left.as_ref() {
+            Tree::traverse_inorder_recursive(values, le);
+        }
+        values.push(node.value);
+        if let Some(ri) = node.right.as_ref() {
+            Tree::traverse_inorder_recursive(values, ri);
+        }
+    }
+
+    fn inorder(&self) -> Vec<i32> {
+        if self.root.is_none() {
+            return Vec::new();
+        }
+        let mut values: Vec<i32> = vec![];
+        let root = self.root.as_ref().unwrap();
+        Tree::traverse_inorder_recursive(&mut values, root);
+
+        values
+    }
+
     fn insert_recursive(node: &mut Box<Node>, value: i32) {
         if value > node.value {
             match &mut node.right {
@@ -130,20 +151,6 @@ impl From<Node> for Option<Box<Node>> {
 mod tests {
     use super::*;
     
-    // #[test]
-    // fn works_builds_tree() {
-    //     let mut tree = Tree::new();
-    //     tree.insert(8);
-    //     tree.insert(10);
-    //     tree.insert(3);
-    //     tree.insert(1);
-    //     tree.insert(6);
-    //     tree.insert(4);
-    
-    //     assert_eq!(tree.root.is_some(), true);
-    //     println!("{:?}", tree.traverse_level());
-    // }
-    
     #[test]
     fn works_builds_tree_traversal() {
         let mut tree = Tree::new();
@@ -158,7 +165,7 @@ mod tests {
         tree.insert(13);
 
         assert_eq!(tree.root.is_some(), true);
-        println!("{:?}", tree.traverse_level());
+        println!("{:?}", tree.inorder());
     }
-
 }
+
