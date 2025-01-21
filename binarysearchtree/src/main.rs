@@ -59,6 +59,42 @@ impl Tree {
         }
     }
 
+    
+
+    pub fn traverse_inorder_iteratively(root: Option<&Box<Node>>, results: &mut Vec<i32>) -> Vec<i32> {
+        let mut queue: Vec<&Box<Node>> = Vec::new();
+        let mut current = root;
+
+        while queue.len() > 0 || current.is_some() {
+            while let Some(node) = current {
+                queue.push(node);
+                current = node.left.as_ref();
+            }
+            if let Some(n) = queue.pop() {
+                results.push(n.value);
+                current = n.right.as_ref();
+            }
+        }
+        results.to_vec()
+    }
+
+    pub fn traverse_recursively(current: &Box<Node>, results: &mut Vec<i32>) -> Vec<i32> {
+        if let Some(left) = current.left.as_ref() {
+            Self::traverse_recursively(left, results);
+        }
+        results.push(current.value); 
+        if let Some(right) = current.right.as_ref() {
+            Self::traverse_recursively(right, results);
+        }
+        results.to_vec()
+    }
+
+    pub fn traverse(&self) -> Vec<i32> {
+        let mut results: Vec<i32> = Vec::new();
+        Self::traverse_inorder_iteratively(self.root.as_ref(), &mut results);
+        results
+    }
+
     pub fn insert(&mut self, val: i32) {
         if self.root.is_none() {
             self.root = Node::new(val);
@@ -82,20 +118,31 @@ pub fn main() {}
 
 mod tests {
     use super::*;
-    
-    #[test]
-    pub fn should_create_tree() {
+
+    pub fn create_tree() -> Tree {
         let mut tree = Tree::new(8);
         tree.insert(3);
         tree.insert(10);
         tree.insert(1);
         tree.insert(6);
-        tree.insert(10);
         tree.insert(14);
         tree.insert(4);
         tree.insert(7);
         tree.insert(13);
-        println!("{:?}", tree);
+        tree 
+    }
+    
+    #[test]
+    pub fn should_traverse_inorder() {
+        let tree = tests::create_tree();
+        tree.traverse();
+    }
+    
+    #[test]
+    pub fn should_create_tree() {
+
+        let tree = tests::create_tree();
+
         let third_left_val = tree
             .root
             .unwrap()
@@ -104,7 +151,6 @@ mod tests {
             .left
             .unwrap()
             .value;
-
 
         assert_eq!(third_left_val, 1);
     }
