@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 #[derive(Debug)]
 pub struct Tree {
     root: Option<Box<Node>>
@@ -89,6 +91,30 @@ impl Tree {
         results.to_vec()
     }
 
+    pub fn traverse_bfs(root: Option<&Box<Node>>, results: &mut Vec<i32>) -> Vec<i32> {
+
+        let mut results: Vec<i32> = Vec::new();
+        let mut queue: VecDeque<&Box<Node>> = VecDeque::new();
+        results.push(root.unwrap().value);
+        queue.push_back(root.unwrap());
+
+        while queue.len() > 0 {
+            for i in 0..queue.len() {
+                if let Some(node) = queue.pop_front() {
+                    if let Some(left) = &node.left {
+                        results.push(left.value);
+                        queue.push_back(left);
+                    }
+                    if let Some(right) = node.right.as_ref() {
+                        results.push(right.value);
+                        queue.push_back(right);
+                    }
+                }
+            }
+        }
+        results
+    }
+
     pub fn traverse(&self) -> Vec<i32> {
         let mut results: Vec<i32> = Vec::new();
         Self::traverse_inorder_iteratively(self.root.as_ref(), &mut results);
@@ -136,6 +162,14 @@ mod tests {
     pub fn should_traverse_inorder() {
         let tree = tests::create_tree();
         tree.traverse();
+    }
+
+    #[test]
+    pub fn should_create_bfs_output() {
+        let tree = tests::create_tree();
+        let mut results: Vec<i32> = vec![];
+        results = Tree::traverse_bfs(tree.root.as_ref(), &mut results);
+        println!("results={:?}", results);
     }
     
     #[test]
