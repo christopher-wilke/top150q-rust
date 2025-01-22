@@ -42,7 +42,10 @@ impl TreeNode {
         let mut q = VecDeque::new();
         q.push_back(root.clone());
 
+        let mut height = 0;
+
         while !q.is_empty() {
+            height += 1;
             for i in 0..q.len() {
                 if let Some(node) = q.pop_front() {
                     if let Some(n) = node {
@@ -60,7 +63,8 @@ impl TreeNode {
         }
 
         println!("results={:?}", results);
-        0
+        println!("height={}", height);
+        height
     }
 
 }
