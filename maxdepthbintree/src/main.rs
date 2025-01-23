@@ -37,33 +37,41 @@ impl TreeNode {
         }
     }
 
-    pub fn max_depth(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        let mut results: Vec<i32> = Vec::new();
-        let mut q = VecDeque::new();
-        q.push_back(root.clone());
+    pub fn max_depth_optimizied(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        if let Some(node) = root {
+            let node = node.borrow();
+            let left_depth = Self::max_depth_optimizied(node.left.clone());
+            let right_depth = Self::max_depth_optimizied(node.right.clone());
+            return 1 + left_depth.max(right_depth);
+        }
+        0
+    }
 
+    pub fn max_depth(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        if root.is_none() {
+            return 0;
+        }
+        let mut results: Vec<i32> = vec![];
+        let mut q: VecDeque<Option<Rc<RefCell<TreeNode>>>> = VecDeque::new();
+        q.push_back(root);
         let mut height = 0;
 
         while !q.is_empty() {
             height += 1;
             for i in 0..q.len() {
-                if let Some(node) = q.pop_front() {
-                    if let Some(n) = node {
-                        let n_ref = n.borrow();
-                        results.push(n_ref.val);
-                        if let Some(left) = &n_ref.left {
-                            q.push_back(Some(left.clone()));
-                        }
-                        if let Some(right) = &n_ref.right {
-                            q.push_back(Some(right.clone()));
-                        }
+                if let Some(Some(node)) = q.pop_front() {
+                    let n = node.borrow_mut();
+                    results.push(n.val);
+                    if let Some(left) = &n.left {
+                        q.push_back(Some(left.clone()));
                     }
-                }
+                    if let Some(right) = &n.right {
+                        q.push_back(Some(right.clone()));
+                    }
+                }            
             }
         }
 
-        println!("results={:?}", results);
-        println!("height={}", height);
         height
     }
 
@@ -76,5 +84,5 @@ fn main() {
     TreeNode::insert_recursively(&root, 15);
     TreeNode::insert_recursively(&root, 23);
     
-    TreeNode::max_depth(root);
+    println!("{}", TreeNode::max_depth_optimizied(root));
 }
