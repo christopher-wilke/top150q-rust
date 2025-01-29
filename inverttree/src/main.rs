@@ -18,58 +18,30 @@ impl TreeNode {
         }
     }
 
-    pub fn invert_tree(root: Option<Rc<RefCell<TreeNode>>>) {
-        let mut results: Vec<i32> = vec![];
+    pub fn invert_tree(root: Option<Rc<RefCell<TreeNode>>>)
+        -> Option<Rc<RefCell<TreeNode>>>
+    {
         let mut q: VecDeque<Option<Rc<RefCell<TreeNode>>>> = VecDeque::new();
         let pointer = &root.clone();
         q.push_back(root);
 
         while !q.is_empty() {
-            for i in 0..q.len() {
+            for _ in 0..q.len() {
                 if let Some(Some(node)) = q.pop_front() {
                     let mut node = node.borrow_mut();
-                    if let (Some(left), Some(right)) =
-                        (node.left.as_ref(), node.right.as_ref())
-                    {
-                        let tmp = node.left.clone();
-                        node.left = node.right.clone();
-                        node.right = tmp;
-                        q.push_back(node.left.clone());
-                        q.push_back(node.right.clone());
-                    }
+
+                    // Swap
+                    let tmp = node.left.clone();
+                    node.left = node.right.clone();
+                    node.right = tmp;
+                    
+                    q.push_back(node.left.clone());
+                    q.push_back(node.right.clone());
                 }
             }
         }
 
-        let p = pointer;
-        println!("
-            {:?}", pointer);
-        Self::bfs(pointer);
-    }
-
-    pub fn bfs(root: &Option<Rc<RefCell<TreeNode>>>) {
-        let mut results: Vec<i32> = vec![];
-        let mut q: VecDeque<Option<Rc<RefCell<TreeNode>>>> = VecDeque::new();
-        q.push_back(root.clone());
-
-        while !q.is_empty() {
-            for i in 0..q.len() {
-                if let Some(Some(node)) = q.pop_front() {
-                    let n = node.borrow();
-                    results.push(n.val);
-
-                    if let Some(left) = n.left.as_ref() {
-                        let my = Some(left.clone());
-                        q.push_back(my); 
-                    }
-                    if let Some(right) = n.right.as_ref() {
-                        let my = Some(right.clone());
-                        q.push_back(my); 
-                    }
-                }
-            }
-        }
-        println!("res after bfs:{:?}", results);
+        pointer.clone()
     }
 
     pub fn insert(current_node: &Option<Rc<RefCell<TreeNode>>>, val: i32) {
@@ -101,5 +73,6 @@ fn main() {
     TreeNode::insert(&root, 6);
     TreeNode::insert(&root, 9);
 
-    TreeNode::invert_tree(root);
+    let res = TreeNode::invert_tree(root);
+    println!("{:?}", res);
 }
